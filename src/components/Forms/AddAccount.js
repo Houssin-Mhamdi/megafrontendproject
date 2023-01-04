@@ -1,26 +1,41 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-
+import React, { useEffect, useState } from "react";
+import {  useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { createAcountAction } from "../../redux/slice/accounts/accountSlice";
+import { useDispatch } from "react-redux";
 const AddAccount = () => {
-  const [transaction, setTransaction] = useState({
-    title: "",
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const [account, setAccount] = useState({
+    name: "",
     initialBalance: "",
     transactionType: "",
     notes: "",
     accountType: "",
   });
   //---Destructuring---
-  const { title, initialBalance, notes, accountType } = transaction;
+  const { name, initialBalance, notes, accountType } = account;
   //---onchange handler----
   const onChange = (e) => {
-    setTransaction({ ...transaction, [e.target.name]: e.target.value });
+    setAccount({ ...account, [e.target.name]: e.target.value });
   };
+  const { account:accountCreated, loading, error, success } = useSelector((state) => state?.accounts)
 
   //---onsubmit handler----
   const onSubmit = (e) => {
     e.preventDefault();
-    console.log(transaction);
+    console.log(account);
+    dispatch(createAcountAction(accountCreated))
   };
+  useEffect(() => {
+    setTimeout(() => {
+      if (success) {
+        navigate("/dashboard",{replace: true});
+        //reload tye page
+        window.location.reload();
+      }
+    }, 1000);
+  }, [success]);
   return (
     <section className="py-16 xl:pb-56 bg-white overflow-hidden">
       <div className="container px-4 mx-auto">
@@ -34,13 +49,13 @@ const AddAccount = () => {
           <form onSubmit={onSubmit}>
             <label className="block mb-5">
               <input
-                value={title}
+                value={name}
                 onChange={onChange}
-                name="title"
+                name="name"
                 className="px-4 py-3.5 w-full text-gray-500 font-medium placeholder-gray-500 bg-white outline-none border border-gray-300 rounded-lg focus:ring focus:ring-indigo-300"
                 id="signUpInput2-1"
                 type="text"
-                placeholder="Enter Title"
+                placeholder="Enter name"
               />
             </label>
             <label className="block mb-5">

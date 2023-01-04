@@ -13,11 +13,20 @@ const AccountDetails = () => {
 
   //get data from the store 
   const { account, error, loading } = useSelector((state) => state?.accounts)
-  console.log(account);
+  const transactions = account?.data?.transactions;
+  const totalIncome = transactions?.filter((transaction) => transaction?.transactionType === 'Income').reduce((acc, curr) => {
+    return acc + curr.amount
+  }, 0)
+
+  const totalExpenses = transactions?.filter((transaction) => transaction?.transactionType === 'Expenses').reduce((acc, curr) => {
+    return acc + curr.amount
+  }, 0)
+  const totalBalance = totalIncome - totalExpenses
+  console.log(totalBalance);
   return (
     <>
       {error && <h2 className="text-center text-red-600 text-2xl mt-5">{error}</h2>}
-      {loading && <h2 className="text-center text-green-600 text-2xl mt-5">Loading ...</h2>}
+
       {/* Account Summary */}
       <section
         className="py-20 xl:pt-24 xl:pb-32 bg-white"
@@ -38,32 +47,37 @@ const AccountDetails = () => {
               {account?.data?.notes}
             </p>
             <Link
-              to={"/edit-account/1"}
+              to={`/edit-account/${account?.data?._id}`}
               className="inline-flex text-center  mb-8 items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               Edit Account
             </Link>
             <div className="flex flex-wrap justify-center -mx-4">
               <div className="w-full md:w-1/3 lg:w-1/4 px-4 mb-8 lg:mb-0">
-                <h2 className="mb-2 text-4xl md:text-5xl text-red-600 font-bold tracking-tighter">
-                  $900
-                </h2>
+                {loading ? <h2 className="text-center text-green-600 text-2xl mt-5">...</h2> : <h2 className="mb-2 text-4xl md:text-5xl text-red-600 font-bold tracking-tighter">
+                  ${totalExpenses}
+                </h2>}
+
                 <p className="text-lg md:text-xl text-coolGray-500 font-medium">
                   Expenses
                 </p>
               </div>
               <div className="w-full md:w-1/3 lg:w-1/4 px-4 mb-8 lg:mb-0">
-                <h2 className="mb-2 text-4xl md:text-5xl text-coolGray-900 font-bold tracking-tighter">
-                  $30.000
-                </h2>
+                {loading ? <h2 className="text-center text-green-600 text-2xl mt-5">...</h2> : <h2 className="mb-2 text-4xl md:text-5xl text-coolGray-900 font-bold tracking-tighter">
+                  ${totalIncome}
+                </h2>}
+
+
                 <p className="text-lg md:text-xl text-green-500 font-medium">
                   Income
                 </p>
               </div>
               <div className="w-full md:w-1/3 lg:w-1/4 px-4">
-                <h2 className="mb-2 text-4xl md:text-5xl text-coolGray-900 font-bold tracking-tighter">
-                  $ 500
-                </h2>
+                {loading ? <h2 className="text-center text-green-600 text-2xl mt-5">...</h2> : <h2 className="mb-2 text-4xl md:text-5xl text-coolGray-900 font-bold tracking-tighter">
+                  $ {totalBalance}
+                </h2>}
+
+
                 <p className="text-lg md:text-xl text-blue-500 font-medium">
                   Balance
                 </p>
